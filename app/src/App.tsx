@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Toaster, toast } from 'sonner'
-import { SearchCheck, Wallet, Loader2, Plus, Link2, Gavel, Newspaper } from 'lucide-react'
+import { Newspaper, Loader2, Link2, Gavel, SearchCheck } from 'lucide-react'
 import { read, write, connectWallet, isWalletConnected, CONTRACT } from './genlayer'
 import { Button } from './components/ui'
 import { NumberTicker } from './components/magic'
@@ -10,7 +10,7 @@ const EXPLORER = `https://explorer-bradbury.genlayer.com/contract/${CONTRACT}`
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`
 type Ev = { by: string; url: string }
 type Claim = { id: string; submitter: string; claim: string; evidence: Ev[]; state: string; rating: string; summary: string }
-const RAT: Record<string, { c: string; label: string }> = { true: { c: '#34d399', label: 'TRUE' }, misleading: { c: '#fbbf24', label: 'MISLEADING' }, false: { c: '#fb7185', label: 'FALSE' }, unverified: { c: '#94a3b8', label: 'UNVERIFIED' } }
+const RAT: Record<string, { c: string; label: string }> = { true: { c: '#15803d', label: 'TRUE' }, misleading: { c: '#b45309', label: 'MISLEADING' }, false: { c: '#b21d2f', label: 'FALSE' }, unverified: { c: '#6c6557', label: 'UNVERIFIED' } }
 
 export default function App() {
   const [wallet, setWallet] = useState<string | null>(null)
@@ -37,69 +37,177 @@ export default function App() {
 
   const c = claims.find((x) => x.id === sel) || null
   const r = c && c.state === 'assessed' ? (RAT[c.rating] ?? RAT.unverified) : null
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase()
+  const SERIF = { fontFamily: 'Playfair Display, Georgia, serif' }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Toaster theme="dark" position="top-right" richColors />
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(900px_circle_at_50%_-10%,#2dd4bf16,transparent_60%)]" />
-      <header className="border-b border-border"><div className="mx-auto flex h-16 max-w-6xl items-center gap-2.5 px-5">
-        <SearchCheck className="h-5 w-5 text-primary" /><span className="text-[15px] font-bold tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>CrowdFactCheck</span>
-        <div className="ml-4 hidden font-mono text-xs text-muted md:block"><b className="text-foreground"><NumberTicker value={stats.total_claims} /></b> claims · <b className="text-primary"><NumberTicker value={stats.assessed} /></b> rated</div>
-        <Button size="sm" className="ml-auto" variant="outline" onClick={() => setCompose(!compose)}><Plus className="h-4 w-4" /> Claim</Button>
-        <Button size="sm" className="ml-2" variant={wallet ? 'outline' : 'primary'} onClick={connect}><Wallet className="h-4 w-4" />{wallet && wallet !== 'connected' ? short(wallet) : wallet ? 'Connected' : 'Connect'}</Button>
-      </div></header>
+      <Toaster theme="light" position="top-right" richColors />
 
-      <main className="mx-auto grid max-w-6xl gap-6 px-5 py-7 lg:grid-cols-[260px_1fr]">
-        {/* claim headlines rail */}
-        <aside>
+      {/* ============================== MASTHEAD ============================== */}
+      <div className="mx-auto max-w-6xl px-5">
+        {/* folio line — dateline · edition · Connect text link (no header bar) */}
+        <div className="flex items-center justify-between gap-3 pt-6 pb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted">
+          <span className="hidden sm:inline">{today}</span>
+          <span className="sm:hidden">Bradbury Edition</span>
+          <span className="hidden md:inline">Testnet Bradbury · Chain 4221</span>
+          <button onClick={connect} className="underline decoration-dotted underline-offset-4 transition-colors hover:text-primary">
+            {wallet && wallet !== 'connected' ? short(wallet) : wallet ? 'Connected ✓' : 'Connect Wallet'}
+          </button>
+        </div>
+
+        {/* top hairline rule (heavy + thin) */}
+        <div className="border-t-4 border-foreground" />
+        <div className="mt-[3px] border-t border-foreground" />
+
+        {/* the masthead title */}
+        <div className="py-6 text-center">
+          <h1 style={SERIF} className="text-5xl font-black leading-none tracking-tight md:text-7xl">CrowdFactCheck</h1>
+          <p style={SERIF} className="mx-auto mt-3 max-w-xl text-sm italic text-muted md:text-base">
+            “Crowd-sourced, consensus-rated fact-checking — the record, examined.”
+          </p>
+        </div>
+
+        {/* bottom hairline rule (thin + heavy) */}
+        <div className="border-t border-foreground" />
+        <div className="mt-[3px] border-t-4 border-foreground" />
+
+        {/* dateline / statistics strip */}
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 py-2.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
+          <span><b className="text-foreground"><NumberTicker value={stats.total_claims} /></b> Claims Filed</span>
+          <span aria-hidden>◆</span>
+          <span><b className="text-primary"><NumberTicker value={stats.assessed} /></b> Verdicts Rendered</span>
+          <span aria-hidden>◆</span>
+          <span><b className="text-foreground"><NumberTicker value={stats.evidence} /></b> Sources Cited</span>
+        </div>
+      </div>
+
+      {/* ================================ BODY =============================== */}
+      <main className="mx-auto grid max-w-6xl gap-8 px-5 py-8 lg:grid-cols-[300px_1fr]">
+
+        {/* ---- LEFT: THE DESK ---- */}
+        <aside className="lg:border-r lg:border-border lg:pr-7">
+          <div className="flex items-end justify-between border-b-2 border-foreground pb-1.5">
+            <h2 style={SERIF} className="text-2xl font-black leading-none">The Desk</h2>
+            <button onClick={() => setCompose(!compose)} className="text-[10px] font-bold uppercase tracking-[0.18em] text-primary underline-offset-4 hover:underline">
+              {compose ? 'Close' : '＋ File a claim'}
+            </button>
+          </div>
+
           {compose && (
-            <div className="mb-3 grid gap-2 rounded-xl border border-border bg-card/60 p-3">
-              <textarea value={claim} onChange={(e) => setClaim(e.target.value)} rows={3} placeholder="A circulating claim…" className="resize-none rounded-md border border-border bg-background/70 px-2.5 py-2 text-sm outline-none focus:border-primary/50" />
-              <Button size="sm" onClick={submit} disabled={creating}>{creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />} File</Button>
+            <div className="mt-3 grid gap-2 border border-border bg-surface p-3">
+              <textarea value={claim} onChange={(e) => setClaim(e.target.value)} rows={3} placeholder="A circulating claim to put on the record…" className="resize-none border border-border bg-background px-2.5 py-2 text-sm outline-none focus:border-primary" />
+              <Button size="sm" onClick={submit} disabled={creating}>{creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <SearchCheck className="h-4 w-4" />} File the claim</Button>
             </div>
           )}
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">The desk</div>
-          <div className="mt-2 space-y-1">
-            {claims.map((x) => { const xr = x.state === 'assessed' ? (RAT[x.rating] ?? RAT.unverified) : null; return (
-              <button key={x.id} onClick={() => setSel(x.id)} className={`block w-full rounded-lg border p-2.5 text-left ${sel === x.id ? 'border-primary/50 bg-primary/5' : 'border-border bg-card/40 hover:bg-card/70'}`}>
-                <div className="line-clamp-2 text-sm leading-snug">{x.claim}</div>
-                <div className="mt-1 text-[10px] font-bold uppercase" style={{ color: xr ? xr.c : '#7f8a99' }}>{xr ? xr.label : `${x.evidence.length} sources · open`}</div>
-              </button>
-            )})}
+
+          <div className="mt-1">
+            {claims.length === 0 && <div className="py-6 text-sm italic text-muted">The desk is clear. File the first claim.</div>}
+            {claims.map((x) => {
+              const xr = x.state === 'assessed' ? (RAT[x.rating] ?? RAT.unverified) : null
+              const on = sel === x.id
+              return (
+                <button key={x.id} onClick={() => setSel(x.id)} className={`block w-full border-b border-border py-3 pl-3 text-left transition-colors ${on ? 'border-l-[3px] border-l-primary bg-[#eee9dd]' : 'border-l-[3px] border-l-transparent hover:bg-[#f0ece1]'}`}>
+                  <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-muted">No. {x.id} · {x.state === 'assessed' ? 'Ruled' : 'Under review'}</div>
+                  <div style={SERIF} className="mt-1 line-clamp-3 text-[15px] font-bold leading-snug">{x.claim}</div>
+                  <div className="mt-1.5 text-[10px] font-black uppercase tracking-wider" style={{ color: xr ? xr.c : '#6c6557' }}>{xr ? `▮ ${xr.label}` : `${x.evidence.length} source${x.evidence.length === 1 ? '' : 's'} on file`}</div>
+                </button>
+              )
+            })}
           </div>
         </aside>
 
-        {/* article */}
+        {/* ---- RIGHT: THE ARTICLE ---- */}
         <article>
-          {!c ? <div className="grid h-64 place-items-center text-sm text-muted">Pick a claim from the desk.</div> : (
-            <>
-              <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.25em] text-muted"><Newspaper className="h-3.5 w-3.5" /> fact-check · #{c.id}</div>
-              <div className="mt-2 flex items-start gap-4">
-                <h1 className="flex-1 text-3xl font-black leading-tight tracking-tight md:text-4xl" style={{ fontFamily: 'Georgia, serif' }}>{c.claim}</h1>
-                {r && <div className="shrink-0 -rotate-6 rounded-xl border-4 px-4 py-2 text-center" style={{ borderColor: r.c, color: r.c }}><div className="text-xl font-black leading-none">{r.label}</div></div>}
+          {!c ? (
+            <div className="grid h-72 place-items-center text-center">
+              <div>
+                <Newspaper className="mx-auto h-8 w-8 text-muted" />
+                <p style={SERIF} className="mt-3 text-xl font-bold text-muted">Select a claim from The Desk.</p>
               </div>
-              {r && c.summary && <p className="mt-4 border-l-4 pl-4 text-lg leading-relaxed text-foreground/85" style={{ borderColor: r.c }}>{c.summary}</p>}
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.3em] text-primary">
+                <Newspaper className="h-3.5 w-3.5" /> Fact-Check Dispatch · No. {c.id}
+              </div>
 
-              {/* footnotes */}
-              <div className="mt-6 border-t border-border pt-4">
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted">Sources on the record</div>
-                <ol className="mt-2 space-y-1.5">
-                  {c.evidence.length === 0 && <li className="text-sm text-muted">No sources cited yet.</li>}
+              <div className="mt-3 flex items-start gap-5">
+                <h1 style={SERIF} className="flex-1 text-4xl font-black leading-[1.04] tracking-tight md:text-5xl">{c.claim}</h1>
+                {r && (
+                  <motion.div
+                    initial={{ scale: 1.5, opacity: 0, rotate: -22 }}
+                    animate={{ scale: 1, opacity: 1, rotate: -8 }}
+                    transition={{ type: 'spring', stiffness: 220, damping: 14 }}
+                    className="shrink-0 select-none border-[3px] px-3 py-1.5 text-center"
+                    style={{ borderColor: r.c, color: r.c, boxShadow: `0 0 0 1px ${r.c} inset` }}
+                  >
+                    <div style={SERIF} className="text-2xl font-black leading-none md:text-3xl">{r.label}</div>
+                    <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.25em]">Verdict</div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* byline / dateline */}
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-y border-border py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">
+                <span>Filed by {short(c.submitter)}</span>
+                <span aria-hidden>·</span>
+                <span>{c.evidence.length} source{c.evidence.length === 1 ? '' : 's'} on the record</span>
+                <span aria-hidden>·</span>
+                <span style={{ color: r ? r.c : undefined }}>{c.state === 'assessed' ? 'Verdict rendered' : 'Awaiting ruling'}</span>
+              </div>
+
+              {/* lede / summary with drop cap */}
+              {r && c.summary ? (
+                <p className="mt-4 text-lg leading-relaxed text-foreground first-letter:float-left first-letter:mr-2.5 first-letter:mt-1 first-letter:text-6xl first-letter:font-black first-letter:leading-[0.7] first-letter:text-primary" style={SERIF}>
+                  {c.summary}
+                </p>
+              ) : (
+                <p style={SERIF} className="mt-4 text-base italic leading-relaxed text-muted">
+                  The validators have not yet ruled. Add sources to the record below, then call for a verdict.
+                </p>
+              )}
+
+              {/* footnotes — numbered cited sources [1][2] */}
+              <div className="mt-7 border-t-2 border-foreground pt-3">
+                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted">Sources on the Record</div>
+                <ol className="mt-3 space-y-2.5">
+                  {c.evidence.length === 0 && <li className="text-sm italic text-muted">No sources cited yet.</li>}
                   {c.evidence.map((e, i) => (
-                    <li key={i} className="flex items-baseline gap-2 text-sm"><span className="font-mono text-xs text-primary">[{i + 1}]</span><a href={e.url} target="_blank" rel="noreferrer" className="truncate text-accent hover:underline">{e.url}</a><span className="text-[10px] text-muted">· {short(e.by)}</span></li>
+                    <li key={i} className="flex items-baseline gap-2.5 text-sm leading-snug">
+                      <span className="font-bold text-primary">[{i + 1}]</span>
+                      <a href={e.url} target="_blank" rel="noreferrer" className="break-all text-accent underline decoration-dotted underline-offset-2 hover:decoration-solid">{e.url}</a>
+                      <span className="shrink-0 text-[10px] uppercase tracking-wider text-muted">— {short(e.by)}</span>
+                    </li>
                   ))}
                 </ol>
               </div>
 
-              <div className="mt-5 flex flex-wrap gap-2">
-                <div className="flex min-w-0 flex-1 gap-2"><input value={evUrl} onChange={(e) => setEvUrl(e.target.value)} placeholder="Add a source URL" className="min-w-0 flex-1 rounded-md border border-border bg-background/70 px-3 py-2 text-sm outline-none focus:border-primary/50" /><Button size="sm" variant="outline" disabled={busy === c.id} onClick={() => addEv(c)}><Link2 className="h-4 w-4" /> Cite</Button></div>
-                {c.evidence.length > 0 && <Button size="sm" disabled={busy === c.id} onClick={() => assess(c)}>{busy === c.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gavel className="h-4 w-4" />} {c.state === 'assessed' ? 'Re-rate' : 'Render verdict'}</Button>}
+              {/* actions */}
+              <div className="mt-6 flex flex-wrap items-center gap-2 border-t border-border pt-4">
+                <div className="flex min-w-0 flex-1 gap-2">
+                  <input value={evUrl} onChange={(e) => setEvUrl(e.target.value)} placeholder="Cite a source URL…" className="min-w-0 flex-1 border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary" />
+                  <Button size="sm" variant="outline" disabled={busy === c.id} onClick={() => addEv(c)}><Link2 className="h-4 w-4" /> Cite</Button>
+                </div>
+                {c.evidence.length > 0 && (
+                  <Button size="sm" disabled={busy === c.id} onClick={() => assess(c)}>
+                    {busy === c.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gavel className="h-4 w-4" />} {c.state === 'assessed' ? 'Re-rate' : 'Render verdict'}
+                  </Button>
+                )}
               </div>
             </>
           )}
         </article>
       </main>
-      <footer className="border-t border-border"><div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 text-xs text-muted"><span>CrowdFactCheck · crowd-sourced, consensus-rated fact-checking</span><a href={EXPLORER} target="_blank" rel="noreferrer" className="hover:text-primary">{short(CONTRACT)} ↗</a></div></footer>
+
+      {/* =============================== IMPRINT ============================== */}
+      <footer className="mt-4 border-t-4 border-foreground">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">
+          <span style={SERIF} className="text-xs font-black tracking-normal text-foreground">CrowdFactCheck</span>
+          <span>Published on-chain · GenLayer Bradbury</span>
+          <a href={EXPLORER} target="_blank" rel="noreferrer" className="underline decoration-dotted underline-offset-4 hover:text-primary">{short(CONTRACT)} ↗</a>
+        </div>
+      </footer>
     </div>
   )
 }
