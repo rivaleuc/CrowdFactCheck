@@ -11,6 +11,7 @@ sources, not one outlet's say-so.
 The verb is **"crowd gathers evidence → consensus synthesizes a rating"** — distinct from a single
 asserter's bonded claim; the evidence set is collective.
 
+- **Live demo:** https://crowdfactcheck.pages.dev
 - **Contract (Bradbury, chain 4221):** `0x8F1576FA69Fa1A1cc9863695B41f03078c9bC775`
 - **Deployed from:** `rivale` (`0xc388…51A44`)
 - **Explorer:** https://explorer-bradbury.genlayer.com/contract/0x8F1576FA69Fa1A1cc9863695B41f03078c9bC775
