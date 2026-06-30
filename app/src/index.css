@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
-/* ----- CrowdFactCheck palette: teal verify + amber, near-black ----- */
+/* ----- CrowdFactCheck: newspaper print, serif, LIGHT ----- */
 @theme {
-  --color-background: #06100e;
-  --color-surface: #0a1714;
-  --color-card: #0d1d19;
-  --color-border: #1c3a33;
-  --color-foreground: #e6f5f0;
-  --color-muted: #82a39b;
+  --color-background: #f6f4ee;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-border: #d9d3c6;
+  --color-foreground: #17150f;
+  --color-muted: #6c6557;
 
-  --color-primary: #2dd4bf;            /* teal-400 — verify */
-  --color-primary-foreground: #03160f;
-  --color-accent: #fbbf24;             /* amber-400 — evidence */
+  --color-primary: #b21d2f;            /* press red */
+  --color-primary-foreground: #ffffff;
+  --color-accent: #1f3a8a;             /* ink blue */
 
-  --color-true: #34d399;               /* true */
-  --color-false: #fb7185;              /* false */
-  --color-unverifiable: #fbbf24;       /* misleading / unverified */
-  --color-ring: #2dd4bf;
+  --color-true: #15803d;
+  --color-false: #b21d2f;
+  --color-unverifiable: #b45309;
+  --color-ring: #b21d2f;
 
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: Georgia, "Times New Roman", ui-serif, serif;
 }
 
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap, 1rem))); } }
@@ -31,11 +31,6 @@
 @layer base {
   * { border-color: var(--color-border); }
   html { scroll-behavior: smooth; }
-  body {
-    background: var(--color-background);
-    color: var(--color-foreground);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-  }
-  ::selection { background: color-mix(in oklab, var(--color-primary) 32%, transparent); }
+  body { background: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  ::selection { background: color-mix(in oklab, var(--color-primary) 22%, transparent); }
 }
