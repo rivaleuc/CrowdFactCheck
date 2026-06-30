@@ -2,6 +2,8 @@
 
 **Crowd-sourced evidence, synthesized into a consensus fact rating, on GenLayer.**
 
+[![GenLayer](https://img.shields.io/badge/GenLayer-Bradbury-ff4d6d)](https://genlayer.com) [![chainId](https://img.shields.io/badge/chainId-4221-4dd0e1)](https://docs.genlayer.com) [![contract](https://img.shields.io/badge/contract-Python%20GenVM-8a63d2)](https://docs.genlayer.com) [![tests](https://img.shields.io/badge/tests-5%2F5%20passing-3fb950)](tests) [![frontend](https://img.shields.io/badge/frontend-React%20%2B%20Vite%20%2B%20genlayer--js-22a6f2)](app) [![live](https://img.shields.io/badge/live-crowdfactcheck.pages.dev-f59e0b)](https://crowdfactcheck.pages.dev) [![License](https://img.shields.io/badge/license-MIT-2dd4bf)](LICENSE)
+
 Anyone submits a circulating claim. The crowd attaches evidence links (supporting or debunking).
 `assess` has every validator independently fetch the gathered evidence and synthesize a rating —
 **true / misleading / false / unverified** — accepted only when validators agree on the **rating**

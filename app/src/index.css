@@ -18,7 +18,7 @@
   --color-unverifiable: #b45309;
   --color-ring: #b21d2f;
 
-  --font-sans: Georgia, "Times New Roman", ui-serif, serif;
+  --font-sans: "Lora", Georgia, serif;
 }
 
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap, 1rem))); } }
